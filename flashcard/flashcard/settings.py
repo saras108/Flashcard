@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'flashcode',
     'rest_framework',
+    'uiux',
 ]
 
 MIDDLEWARE = [
