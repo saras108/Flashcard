@@ -10,63 +10,103 @@
 </head>
 <body>
 
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark" style="margin-bottom: 15px;">
         <a class="navbar-brand" href="#">Home</a>
       </nav>
 
-      
-
-    <div class="container">
-        <div id="accordion">
-
-            <div class="card">
-              <div class="card-header" id="headingOne">
-                <h5 class="mb-0">
-                  <button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                    Collapsible Group Item #1
-                  </button>
-                </h5>
+      <div class="container">
+        <div class="task-container">
+          <div id="form-wrapper">
+            <form action="#" id="form">
+              <div class="flex-wrapper">
+                  <input type="text" id="title" class="form-control" name="title", placeholder="Flashcard Title">
+                <br>
+                  <input type="text" id="description" class="form-control" name="description", placeholder="Description">            
+                <br>
+                  <input type="submit" class="btn btn-primary" id="submit">
               </div>
-          
-              <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
-                <div class="card-body">
-                  Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
-                </div>
-              </div>
-            </div>
-
-            <div class="card">
-              <div class="card-header" id="headingTwo">
-                <h5 class="mb-0">
-                  <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                    Collapsible Group Item #2
-                  </button>
-                </h5>
-              </div>
-              <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
-                <div class="card-body">
-                  Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
-                </div>
-              </div>
-            </div>
-
-            <div class="card">
-              <div class="card-header" id="headingThree">
-                <h5 class="mb-0">
-                  <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                    Collapsible Group Item #3
-                  </button>
-                </h5>
-              </div>
-              <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordion">
-                <div class="card-body">
-                  Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
-                </div>
-              </div>
-            </div>
-            
+            </form>
           </div>
-    </div>
+
+          <hr>
+          <h2 style="text-align: center;">Flashcards</h2>
+
+          <div id="list-wrapper">
+
+            <!-- Here comes code from javascript -->
+
+          </div>
+        </div>
+      </div>
+
+
+    <script type="text/javascript">
+
+refreshlist()
+
+      // responsible for calling data and outputing it to an list wrapper
+      function refreshlist(){
+        var wrapper = document.getElementById('list-wrapper')
+
+        var url = 'http://127.0.0.1:8000/api/card_list'
+        wrapper.innerHTML = ''
+
+        fetch(url)
+        .then((rsp)=>rsp.json())
+        .then(function(data){
+          console.log('Data:',data)
+          var list = data
+          for (var i in list){
+            var item = `
+        <div id="accordion">
+          <div class="card">
+            <div class="card-header" id="title-${i}">
+              
+              <div class="row">
+                <div class="col-md-8">
+              
+                    <h5 class="mb-0">
+                      <p class="btn btn-link" data-toggle="collapse" data-target="#description-${i}" aria-expanded="true" aria-controls="description-${i}">
+                        ${(list[i].title)}
+                      </p>
+                    </h5>
+                    </div>
+
+                <div class="col-md-4">
+
+                  <div class="row">
+
+                  <div class="col-md-4">
+                    <button  class="btn btn-primary">Edit</button>
+                  </div>
+                  <div class="col-md-4">
+                    <button  class="btn btn-danger">Delete</button>
+                  </div>
+                  <div class="col-md-4">
+                    <button  class="btn btn-warning">Remembred</button>
+                  </div>
+                </div>
+                </div>
+              </div>
+            </div>
+
+            <div id="description-${i}" class="collapse" aria-labelledby="title-${i}" data-parent="#accordion">
+              <div class="card-body">
+                ${(list[i].description)}
+              </div>
+            </div>
+          </div>
+
+        </div>
+                      
+            `
+
+          wrapper.innerHTML+= item
+          }
+        })
+      }
+
+    </script>
     
 </body>
 
