@@ -9,7 +9,7 @@ from .models import *
 """  Get all the flashcards   """
 @api_view(['GET'])
 def cards(request):
-    cards = Flashcard.objects.all()
+    cards = Flashcard.objects.all().order_by('-id')
     serializer = CardSerializers(cards , many= True)
     return Response(serializer.data)
 
