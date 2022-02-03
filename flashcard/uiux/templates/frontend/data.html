@@ -42,7 +42,25 @@
 
     <script type="text/javascript">
 
-refreshlist()
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        const csrftoken = getCookie('csrftoken');
+        var activeCard = null
+
+        refreshlist()
 
       // responsible for calling data and outputing it to an list wrapper
       function refreshlist(){
@@ -54,7 +72,7 @@ refreshlist()
         fetch(url)
         .then((rsp)=>rsp.json())
         .then(function(data){
-          console.log('Data:',data)
+          // console.log('Data:',data)
           var list = data
           for (var i in list){
             var item = `
@@ -77,13 +95,13 @@ refreshlist()
                   <div class="row">
 
                   <div class="col-md-4">
-                    <button  class="btn btn-primary">Edit</button>
+                    <button  class="btn btn-primary edit">Edit</button>
                   </div>
                   <div class="col-md-4">
-                    <button  class="btn btn-danger">Delete</button>
+                    <button  class="btn btn-danger delete">Delete</button>
                   </div>
                   <div class="col-md-4">
-                    <button  class="btn btn-warning">Remembred</button>
+                    <button  class="btn btn-warning remembred">Remembred</button>
                   </div>
                 </div>
                 </div>
@@ -97,15 +115,90 @@ refreshlist()
             </div>
           </div>
 
-        </div>
-                      
+        </div>      
             `
 
-          wrapper.innerHTML+= item
+        wrapper.innerHTML+= item
+
+        }
+
+        for (var i in list){
+        var edit_btn = document.getElementsByClassName('edit')[i]
+        var dlt_btn = document.getElementsByClassName('delete')[i]
+
+
+        edit_btn.addEventListener('click' , (function(item){
+          return function(){
+            editCard(item)
           }
+        })(list[i]))
+
+        dlt_btn.addEventListener('click' , (function(item){
+          return function(){
+            deleteCard(item)
+          }
+        })(list[i]))
+
+        }
+
         })
       }
 
+      // Event Listner to create a data through the form
+      var form = document.getElementById('form-wrapper')
+      form.addEventListener('submit', function(e){
+        e.preventDefault() //this prevents the form from being submitted
+
+        var url = 'http://127.0.0.1:8000/api/card_create/'
+
+        if(activeCard!= null){
+          var url = `http://127.0.0.1:8000/api/card_update/${activeCard.id}`
+          activeCard = null
+        }
+
+
+        var title = document.getElementById('title').value
+        var description = document.getElementById('description').value
+
+        // console.log(title , description)
+
+        fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-type': 'application/json',
+            'X-CSRFToken' : csrftoken,
+          },
+          body:JSON.stringify({'title': title, 'description':description})
+          
+        }).then(function(response){
+          refreshlist()
+          document.getElementById('form').reset()
+        })
+      })
+
+
+        function editCard(card){
+          activeCard = card
+          // console.log(activeCard.title)
+          document.getElementById('title').value = activeCard.title
+          document.getElementById('description').value = activeCard.description
+        }
+
+
+        function deleteCard(card){
+          activeCard = card
+          console.log('delete clicked!')
+
+          fetch(`http://127.0.0.1:8000/api/card_delete/${card.id}` , {
+            method:'DELETE',
+            headers: {
+              'Content-type': 'application/json',
+              'X-CSRFToken' : csrftoken,
+            }
+          }).then((response) => {
+            refreshlist()
+          })
+        }
     </script>
     
 </body>
