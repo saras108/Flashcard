@@ -1,4 +1,3 @@
-
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
@@ -22,7 +21,7 @@ def card_data(request, pk):
     return Response(serializer.data)
 
 
-""" Save the data to the database."""
+""" Save the card's data to the database."""
 @api_view(['POST'])
 def card_create(request):
     serializer = CardSerializers(data= request.data)
@@ -30,7 +29,7 @@ def card_create(request):
         serializer.save()
     return Response(serializer.data)
 
-""" Update the data to the database."""
+""" Update the card's data to the database."""
 @api_view(['POST'])
 def card_update(request , pk):
     card = Flashcard.objects.get(id = pk)
@@ -40,10 +39,19 @@ def card_update(request , pk):
     return Response(serializer.data)
 
 
-""" Delete the data from the database."""
+""" Delete the card's data from the database."""
 @api_view(['DELETE'])
 def card_delete(request , pk):
     card = Flashcard.objects.get(id = pk)
     card.delete()    
     return Response("Selected data sucessfully deleted!")
 
+
+""" Update the status to remembred to False to True and True to False respectively!"""
+@api_view(['POST'])
+def card_remember(request , pk):    
+    card = Flashcard.objects.get(id = pk)
+    serializer = CardSerializers( instance = card ,data= request.data)
+    if serializer.is_valid():
+        serializer.save()
+    return Response(serializer.data)

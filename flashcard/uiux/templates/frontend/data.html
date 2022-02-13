@@ -125,6 +125,7 @@
         for (var i in list){
         var edit_btn = document.getElementsByClassName('edit')[i]
         var dlt_btn = document.getElementsByClassName('delete')[i]
+        var remembered = document.getElementsByClassName('remembred')[i]
 
 
         edit_btn.addEventListener('click' , (function(item){
@@ -136,6 +137,12 @@
         dlt_btn.addEventListener('click' , (function(item){
           return function(){
             deleteCard(item)
+          }
+        })(list[i]))
+
+        remembered.addEventListener('click' , (function(item){
+          return function(){
+            remember_card(item)
           }
         })(list[i]))
 
@@ -195,6 +202,26 @@
               'Content-type': 'application/json',
               'X-CSRFToken' : csrftoken,
             }
+          }).then((response) => {
+            refreshlist()
+          })
+        }
+
+        function  remember_card(card){
+
+          if(card.remembred == False){
+            rem = True
+          }else{
+            rem = False
+          }
+          console.log('card remembred!')
+          fetch(`http://127.0.0.1:8000/api/card_remember/${card.id}`, {
+            method : 'Post',
+            headers: {
+              'Content-type': 'application/json',
+              'X-CSRFToken' : csrftoken,
+            },
+            body: {'title': title, 'description':description , 'remembred':rem}
           }).then((response) => {
             refreshlist()
           })
