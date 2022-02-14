@@ -8,5 +8,4 @@ urlpatterns = [
     path('card_create/', views.card_create , name="card_create"),
     path('card_update/<str:pk>', views.card_update , name="card_update"),
     path('card_delete/<str:pk>', views.card_delete , name="card_delete"),
-    path('card_remember/<str:pk>', views.card_remember , name="card_remember"),
 ]

@@ -45,13 +45,3 @@ def card_delete(request , pk):
     card = Flashcard.objects.get(id = pk)
     card.delete()    
     return Response("Selected data sucessfully deleted!")
-
-
-""" Update the status to remembred to False to True and True to False respectively!"""
-@api_view(['POST'])
-def card_remember(request , pk):    
-    card = Flashcard.objects.get(id = pk)
-    serializer = CardSerializers( instance = card ,data= request.data)
-    if serializer.is_valid():
-        serializer.save()
-    return Response(serializer.data)
