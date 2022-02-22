@@ -44,6 +44,8 @@
 
     <script type="text/javascript">
 
+        // to get and pass the csrf token using ajax
+        // refrence: https://docs.djangoproject.com/en/4.0/ref/csrf/
         function getCookie(name) {
             let cookieValue = null;
             if (document.cookie && document.cookie !== '') {
@@ -64,7 +66,7 @@
 
         refreshlist()
 
-      // responsible for calling data and outputing it to an list wrapper
+      // responsible for featching data and outputing it to an list wrapper
       function refreshlist(){
         var wrapper = document.getElementById('list-wrapper')
 
@@ -74,13 +76,15 @@
         fetch(url)
         .then((rsp)=>rsp.json())
         .then(function(data){
-          // console.log('Data:',data)
+
+          // populating the data
           var list = data
           for (var i in list){
             var status = `<button  class="btn btn-warning remembred">Remembred</button>`
             if(list[i].remembred == true){
               var status = `<button  class="btn btn-info remembred">Remembred</button>`
             }
+            // Portion of Html to be rendered
             var item = `
         <div id="accordion">
           <div class="card">
@@ -130,24 +134,27 @@
         wrapper.innerHTML+= item
         }
 
-
-        for (var i in list){
+        // loop to get the current card which has been clicked.
+        for (var i in list){ 
         var edit_btn = document.getElementsByClassName('edit')[i]
         var dlt_btn = document.getElementsByClassName('delete')[i]
         var remembered = document.getElementsByClassName('remembred')[i]
 
-        edit_btn.addEventListener('click' , (function(item){
+        // event listner when edit_btn is clicked
+        edit_btn.addEventListener('click' , (function(item){ 
           return function(){
-            editCard(item)
+            editCard(item) // item to be edited is passed to editCard function
           }
-        })(list[i]))
+        })(list[i])) //list[i] item will be passed
 
+        // event listner when dlt_btn is clicked
         dlt_btn.addEventListener('click' , (function(item){
           return function(){
             deleteCard(item)
           }
         })(list[i]))
 
+        // event listner when remembered is clicked
         remembered.addEventListener('click' , (function(item){
           return function(){
             remember_card(item)
@@ -162,15 +169,19 @@
       // Event Listner to create a data through the form
       var form = document.getElementById('form-wrapper')
       form.addEventListener('submit', function(e){
-        e.preventDefault() //this prevents the form from being submitted
+        //this prevents the form from being submitted
+        e.preventDefault() 
 
+        // When submit is clicked for create purpose
         var url = 'http://127.0.0.1:8000/api/card_create/'
-
-        if(activeCard!= null){
-          var url = `http://127.0.0.1:8000/api/card_update/${activeCard.id}`
+        
+        // When submit is clicked for edit purpose
+        if(activeCard!= null){  
+          var url = `http://127.0.0.1:8000/api/card_update/${activeCard.id}` // this url when we update the data
           activeCard = null
         }
 
+        // Getting the data so that we can stringfy the data cleanly.
         var title = document.getElementById('title').value
         var description = document.getElementById('description').value
         var defination = document.getElementById('defination').value
@@ -185,19 +196,21 @@
           body:JSON.stringify({'title': title, 'description':description , 'defination':defination})
           
         }).then(function(response){
-          refreshlist()
-          document.getElementById('form').reset()
+          refreshlist()  //run the refreshlist
+          document.getElementById('form').reset() //clear the form fields.
         })
       })
 
-        function editCard(card){
+        // function to edit card, it will Populate the cards data into the form fields.
+        function editCard(card){ 
           activeCard = card
-          // console.log(activeCard.title)
+
           document.getElementById('title').value = activeCard.title
           document.getElementById('description').value = activeCard.description
           document.getElementById('defination').value = activeCard.defination
         }
 
+        // function to delete card.
         function deleteCard(card){
           activeCard = card
           fetch(`http://127.0.0.1:8000/api/card_delete/${card.id}` , {
@@ -211,17 +224,16 @@
           })
         }
 
+
+        // function to remember card.
         function  remember_card(card){
           card.remembred = !card.remembred
-
-          // console.log(card)
           fetch(`http://127.0.0.1:8000/api/card_update/${card.id}`, {
             method : 'Post',
             headers: {
               'Content-type': 'application/json',
               'X-CSRFToken' : csrftoken,
             },
-            // body: JSON.stringify({'title': card.title, 'description':card.description , 'remembred':card.remembred})
             body: JSON.stringify({'title': card.title, 'remembred':card.remembred})
           }).then((response) => {
             refreshlist()
